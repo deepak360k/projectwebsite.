@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skeletal Dragon Cursor Chaser</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #221f1f; /* Deep red background like the image */
+            font-family: sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        #instructions {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: #d02308;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 14px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="instructions">Chronicles1ai</div>
+
+    <!-- Import Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // --- 1. SETUP THE SCENE ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color; // Dark Red background
+        scene.fog = new THREE.Fog(0x4a0000, 20, 100);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 31, 40);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // --- 2. LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0xeef, 0.88);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        scene.add(dirLight);
+
+        const spotLight = new THREE.SpotLight(0xffaa00, 0.5);
+        spotLight.position.set(-10, 10, 0);
+        scene.add(spotLight);
+
+        // --- 3. MATERIALS ---
+        const boneMaterial = new THREE.MeshStandardMaterial({ 
+            color: 2550000, 
+            roughness: 0.1,
+            metalness: 0.5
+        });
+
+        // --- 4. DRAGON CONSTRUCTION ---
+
+        // Helper to create a single bone segment
+        function createVertebra(scale = 1) {
+            const group = new THREE.Group();
+            
+            // The main spine block
+            const geo = new THREE.BoxGeometry(1.5 * scale, 1.2 * scale, 1.5 * scale);
+            const mesh = new THREE.Mesh(geo, boneMaterial);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            group.add(mesh);
+
+            // Spiky bit on top (Spinous process)
+            const spikeGeo = new THREE.ConeGeometry(0.9 * scale, 2 * scale, 8);
+            const spike = new THREE.Mesh(spikeGeo, boneMaterial);
+            spike.position.y = 3 * scale;
+            spike.castShadow = true;
+            group.add(spike);
+
+            return group;
+        }
+
+        // Helper to create ribs
+        function createRibs(scale = 1) {
+            const ribGroup = new THREE.Group();
+            
+            // Create a curved rib shape using TorusGeometry
+            // radius, tube, radialSegments, tubularSegments, arc
+            const ribGeo = new THREE.TorusGeometry(3 * scale, 0.15 * scale, 9, 16, Math.PI * 0.8);
+            
+            // Left Rib
+            const leftRib = new THREE.Mesh(ribGeo, boneMaterial);
+            leftRib.rotation.y = Math.PI; // Face back
+            leftRib.rotation.z = -Math.PI / 2; // Angle down
+            leftRib.position.set(0, 0, 0);
+            leftRib.castShadow = true;
+            ribGroup.add(leftRib);
+
+            // Right Rib
+            const rightRib = new THREE.Mesh(ribGeo, boneMaterial);
+            rightRib.rotation.y = 0;
+            rightRib.rotation.z = Math.PI / 4;
+            rightRib.position.set(0, 0, 0);
+            rightRib.castShadow = true;
+            ribGroup.add(rightRib);
+
+            return ribGroup;
+        }
+
+        // Helper to create the Head
+        function createHead() {
+            const headGroup = new THREE.Group();
+
+            // Cranium
+            const craniumGeo = new THREE.BoxGeometry(2.5, 2, 3);
+            const cranium = new THREE.Mesh(craniumGeo, boneMaterial);
+            headGroup.add(cranium);
+
+            // Snout
+            const snoutGeo = new THREE.BoxGeometry(1.8, 1.2, 4);
+            const snout = new THREE.Mesh(snoutGeo, boneMaterial);
+            snout.position.z = 2.5; // Forward
+            snout.position.y = -0.4;
+            headGroup.add(snout);
+
+            // Lower Jaw
+            const jawGeo = new THREE.BoxGeometry(1.4, 0.5, 3.5);
+            const jaw = new THREE.Mesh(jawGeo, boneMaterial);
+            jaw.position.z = 2.0;
+            jaw.position.y = -1.5;
+            jaw.rotation.x = 0.2; // Open mouth slightly
+            headGroup.add(jaw);
+
+            // Horns
+            const hornGeo = new THREE.ConeGeometry(0.2, 4, 8);
+            
+            const leftHorn = new THREE.Mesh(hornGeo, boneMaterial);
+            leftHorn.position.set(-0.8, 1.5, -0.5);
+            leftHorn.rotation.x = -0.5;
+            headGroup.add(leftHorn);
+
+            const rightHorn = new THREE.Mesh(hornGeo, boneMaterial);
+            rightHorn.position.set(0.8, 1.5, -0.5);
+            rightHorn.rotation.x = -0.5;
+            headGroup.add(rightHorn);
+
+            // Eyes (empty sockets - using black boxes)
+            const eyeGeo = new THREE.BoxGeometry(0.8, 0.6, 0.5);
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            
+            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+            leftEye.position.set(-1.0, 0.2, 1.0);
+            headGroup.add(leftEye);
+
+            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+            rightEye.position.set(1.0, 0.2, 1.0);
+            headGroup.add(rightEye);
+
+            return headGroup;
+        }
+
+        // Build the Dragon
+        const segments = [];
+        const numSegments = 65;
+        const segmentDist = 1.0; // Distance between bones
+
+        // 1. Create Head
+        const head = createHead();
+        scene.add(head);
+        segments.push(head);
+
+        // 2. Create Body
+        for (let i = 0; i < numSegments; i++) {
+            // Taper the tail size
+            let scale = 1 - (i / numSegments) * 0.8;
+            scale = Math.max(scale, 0.2);
+
+            const vertebra = createVertebra(scale);
+            
+            // Position initially behind the head
+            vertebra.position.z = - (i + 1) * segmentDist;
+            
+            // Add ribs to the upper torso (approx indices 2 to 15)
+            if (i > 1 && i < 18) {
+                const ribs = createRibs(scale);
+                vertebra.add(ribs);
+            }
+
+            // Add simple legs (Front and Back)
+            if (i === 4 || i === 6||i===8||i===10||i===12||i===14||i===16||i===18||i===20||i===22||i===24||i===26||i===28||i===30||i===32||i===34||i===36||i===38||i===40||i===42||i===44||i===46) {
+                const limbGeo = new THREE.CylinderGeometry(0.2 * scale, 0.1 * scale, 6 * scale);
+                const limbLeft = new THREE.Mesh(limbGeo, boneMaterial);
+                limbLeft.rotation.z = Math.PI / 3;
+                limbLeft.position.set(2 * scale, -2 * scale, 0);
+                vertebra.add(limbLeft);
+
+                const limbRight = new THREE.Mesh(limbGeo, boneMaterial);
+                limbRight.rotation.z = -Math.PI / 3;
+                limbRight.position.set(-2 * scale, -2 * scale, 0);
+                vertebra.add(limbRight);
+            }
+
+            scene.add(vertebra);
+            segments.push(vertebra);
+        }
+
+        // --- 5. INTERACTION LOGIC ---
+        
+        // Plane for mouse raycasting (invisible floor at y=0)
+        const planeGeo = new THREE.PlaneGeometry(200, 200);
+        const planeMat = new THREE.MeshBasicMaterial({ visible: false });
+        const mousePlane = new THREE.Mesh(planeGeo, planeMat);
+        mousePlane.rotation.x = -Math.PI / 2;
+        scene.add(mousePlane);
+
+        // Shadow Plane (Visible floor)
+        const shadowPlaneGeo = new THREE.PlaneGeometry(200, 200);
+        const shadowPlaneMat = new THREE.ShadowMaterial({ opacity: 0.3 });
+        const shadowPlane = new THREE.Mesh(shadowPlaneGeo, shadowPlaneMat);
+        shadowPlane.rotation.x = -Math.PI / 2;
+        shadowPlane.position.y = -4; // slightly below dragon
+        shadowPlane.receiveShadow = true;
+        scene.add(shadowPlane);
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const targetPos = new THREE.Vector3();
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        window.addEventListener('mousemove', onMouseMove, false);
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- 6. ANIMATION LOOP ---
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 1. Find where mouse intersects the world plane
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(mousePlane);
+
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                // Add some "flying" height variation
+                point.y = Math.sin(Date.now() * 0.002) * 2; 
+                targetPos.copy(point);
+            }
+
+            // 2. Move Head towards target (Ease / Lerp)
+            // Using a spring-like motion for the head
+            head.position.lerp(targetPos, 0.05);
+            head.lookAt(targetPos);
+
+            // 3. Move Body Segments (Inverse Kinematics / Follow the Leader)
+            for (let i = 1; i < segments.length; i++) {
+                const current = segments[i];
+                const prev = segments[i - 1];
+
+                // Calculate distance to the bone in front
+                const targetPos = prev.position.clone();
+                // We want to be 'segmentDist' away from the previous bone
+                // But specifically BEHIND it.
+                // A simpler "Drag" approach:
+                
+                // Get vector from current to previous
+                const direction = new THREE.Vector3().subVectors(prev.position, current.position);
+                const distance = direction.length();
+
+                // If too far, pull closer
+                if (distance > segmentDist) {
+                    const moveDir = direction.normalize();
+                    const moveDist = distance - segmentDist;
+                    current.position.add(moveDir.multiplyScalar(moveDist));
+                }
+
+                // Orientation: Look at the bone in front
+                current.lookAt(prev.position);
+                
+                // Add some sine wave wiggle to the tail for "alive" feeling
+                if(i > 10) {
+                    current.position.y += Math.sin(Date.now() * 0.005 + i * 0.2) * 0.02;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+    </script>
+</body>
+</html>

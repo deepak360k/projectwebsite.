@@ -1,0 +1,107 @@
+*{
+  margin:0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+.container{
+  width: 350px;
+  background-image: url(https://wallpapercave.com/wp/wp4064613.jpg);
+  background: #a28e43;
+  padding: 25px;
+  margin: 60px auto;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #0002;
+}
+h2{
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+input{
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #888;
+}
+
+button{
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover{
+  background: #0056b3;
+}
+
+.navbar{
+  /* background: #1157a2; */
+  padding: 15px;
+  text-align: center;
+}
+
+.navbar a{
+  color: rgb(243, 236, 236);
+  margin: 0 15px;
+  text-decoration: none;
+  font-size: 18px;
+}
+.navbar a:hover{
+  text-decoration: underline;
+}
+
+.page{
+    color: #06101a;
+  width: 100%;
+  margin: 0px auto;
+  background-color: #a28e43;
+  width: 350px;
+  background: #d8b226;
+  
+  padding: 22px;
+ border-radius: 32px;
+  box-shadow: 0 0 10px #0002;
+}
+.mage{
+    color: #06101a;
+  width: 100%;
+  margin: 50px auto;
+  background-color: #a28e43;
+  width: 350px;
+  background: #34e977;
+  padding: 22px;
+ border-radius: 32px;
+  box-shadow: 0 0 10px #0002;
+
+}
+.tage{
+    color: #06101a;
+  width: 100%;
+  margin: 50px auto;
+  background-color: #a28e43;
+  width: 350px auto;
+  background: #2f9856;
+  padding: 12px;
+ border-radius: 32px;
+  box-shadow: 0 0 10px #0002;
+}
+.age{
+    color: #06101a;
+  width: 100%;
+  margin: 50px auto;
+  background-color: #a28e43;
+  width: 350px auto;
+  background: #d4c99b;
+  padding: 12px;
+ border-radius: 32px;
+  box-shadow: 0 0 10px #0002;
+}
