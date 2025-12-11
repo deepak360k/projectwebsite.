@@ -1,1 +1,2 @@
 # projectwebsite.
+Study Hub is a simple and user-friendly educational website built using HTML, CSS, and JavaScript. It includes essential pages like Home, Courses, About, Contact, Login, and Signup, along with a functional signup–login system using localStorage. The platform provides organized study materials, attractive UI sections, and smooth navigation to enhance the learning experience. This project demonstrates front-end development skills, clean design structure, and practical implementation of web concepts
